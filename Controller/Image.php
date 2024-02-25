@@ -23,23 +23,29 @@ class Image extends FrontendController
         $crop = in_array($crop, ['o', 'k']) ? $crop : 'o';
         // 缩略图的路径
         $pathInfo = pathinfo($sourcePath);
-        $filePrePath = dirname(str_replace($mediaPath, $mediaPath . 'thumbnail' . DS, $sourcePath));
-        if (!is_dir($filePrePath)) {
-            mkdir($filePrePath, 0777, true);
-        }
-        // 缩略图的路径
-        $thumbnailPath = $filePrePath . DS . $pathInfo['filename'] . "_w_{$width}_h_{$height}_c_{$crop}.{$pathInfo['extension']}";
-        if (!file_exists($thumbnailPath)) {
-            $thumbnailResult = self::generateThumbnail($sourcePath, $thumbnailPath, $width, $height, $crop);
-            if (!$thumbnailResult) {
-                $this->redirect(404);
+        // 排除矢量图拓展名
+        $excludeExt = ['svg', 'SVG'];
+        if (in_array($pathInfo['extension'], $excludeExt)) {
+            $thumbnailPath = $sourcePath;
+        }else{
+            $filePrePath = dirname(str_replace($mediaPath, $mediaPath . 'thumbnail' . DS, $sourcePath));
+            if (!is_dir($filePrePath)) {
+                mkdir($filePrePath, 0777, true);
+            }
+            // 缩略图的路径
+            $thumbnailPath = $filePrePath . DS . $pathInfo['filename'] . "_w_{$width}_h_{$height}_c_{$crop}.{$pathInfo['extension']}";
+            if (!file_exists($thumbnailPath)) {
+                $thumbnailResult = self::generateThumbnail($sourcePath, $thumbnailPath, $width, $height, $crop);
+                if (!$thumbnailResult) {
+                    $this->redirect(404);
+                }
             }
         }
         if (file_exists($thumbnailPath)) {
             $length = filesize($thumbnailPath);
             $filemtime = date('D, d M Y H:i:s', filemtime($thumbnailPath));
             $expires = date('D, d M Y H:i:s', filemtime($thumbnailPath));
-            header('Content-Type:image/jpeg');
+            header('Content-Type:'.mime_content_type($thumbnailPath));
             header("Content-Length:{$length}");
             header("Last-Modified:{$filemtime}");
             header("Expires:{$expires}");
