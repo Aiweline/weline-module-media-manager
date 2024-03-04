@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<menus xmlns:xs="http://www.w3.org/2001/XMLSchema-instance"
+       xs:noNamespaceSchemaLocation="urn:weline:module:Weline_Backend::etc/xsd/menu.xsd"
+       xs:schemaLocation="urn:weline:module:Weline_Backend::etc/xsd/menu.xsd">
+    <add source="Weline_MediaManager:main" name="main" title="媒体管理器"
+         action="media/backend/manager" parent="Weline_Backend::system_module"
+         icon="mdi mdi-file-tree" order="1"/>
+</menus>
